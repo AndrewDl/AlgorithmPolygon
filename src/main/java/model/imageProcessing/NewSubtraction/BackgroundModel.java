@@ -18,6 +18,7 @@ public class BackgroundModel {
     private int frameSize = 40;
     private int matchingThreshold = 20;
     private int requiredMatches = 2;
+    private int updateFactor = 16;
 
     public BackgroundModel(int sampleSize, ImageGray baseImage){
         cards = new ArrayList<>();
@@ -65,5 +66,32 @@ public class BackgroundModel {
         }
 
         return false;
+    }
+
+    private boolean update(int x, int y, int color){
+
+        if ( r.nextInt(100) < (1/updateFactor * 100) ){
+
+
+            int xshift = r.nextInt(2) - 1 ;
+            int yshift = r.nextInt(2) - 1 ;
+
+            int width = cards.get(0).getWidth();
+            int height = cards.get(0).getWidth();
+
+            int x1 = x + xshift > width ? x - xshift : Math.abs(x + xshift) ;
+            int y1 = y + yshift > height ? y - yshift : Math.abs(y + yshift) ;
+
+            cards.get(r.nextInt(20)).setRGB(x,y,color);
+            cards.get(r.nextInt(20)).setRGB(x1,y1,color);
+
+        }
+
+        return false;
+    }
+
+    private int getRandPixel(){
+        //TODO: complete this
+        return 0;
     }
 }
