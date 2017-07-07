@@ -20,7 +20,7 @@ public class CameraImageJavaCV implements ICamera{
     private Thread T = null;
     private boolean connectionLost = false;
     private BufferedImage imageRTSP = null;
-    private final Logger userLogger = LogManager.getLogger("MainLogger");
+//    private final Logger userLogger = LogManager.getLogger("MainLogger");
     private FFmpegFrameGrabber grabber = null;// new FFmpegFrameGrabber(addressRTSP);
 
     private boolean interrupted = false;
@@ -64,7 +64,7 @@ public class CameraImageJavaCV implements ICamera{
                         imageRTSP = grabber.grab().getBufferedImage();
                     } catch (FrameGrabber.Exception e) {
                         //imageRTSP = null;
-                        userLogger.error("JavaCV error: "+e.getMessage());
+                      //  userLogger.error("JavaCV error: "+e.getMessage());
                         e.printStackTrace();
                         interrupt();
                         setConnectionLost(true);

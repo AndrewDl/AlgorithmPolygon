@@ -3,9 +3,10 @@ package model.imageProcessing.NewSubtraction;
 import com.sun.istack.internal.NotNull;
 import com.sun.istack.internal.Nullable;
 import model.imageProcessing.ISubtractor;
+import model.imageProcessing.imageTypes.ImageBin;
 import model.imageProcessing.imageTypes.ImageGray;
-import model.imageProcessing.imageTypes.NVImage;
 
+import java.awt.*;
 import java.awt.image.BufferedImage;
 
 /**
@@ -13,16 +14,34 @@ import java.awt.image.BufferedImage;
  */
 public class NewBGSubtractor implements ISubtractor {
 
-    BufferedImage foreground = null;
+    BufferedImage image;
+    BackgroundModel backgroundModel;
+
+    private NewBGSubtractor(){}
+
+    public NewBGSubtractor(ImageGray initialImage){
+         backgroundModel = new BackgroundModel(initialImage, 20);
+         image = new BufferedImage(initialImage.getWidth(),initialImage.getHeight(),BufferedImage.TYPE_INT_RGB);
+    }
 
     @Override
-    public NVImage getSubtractedImage(@NotNull ImageGray foreground, @Nullable ImageGray background) {
-        BackgroundModel backgroundModel = new BackgroundModel(20,foreground);
+    public ImageBin getSubtractedImage(@NotNull ImageGray foreground, @Nullable ImageGray background) {
 
-        this.foreground = foreground.toBufferedImage();
+        //init model
+        for (int x = 0; x < foreground.getWidth(); x++) {
+            for (int y = 0; y < foreground.getHeight(); y++) {
+                long t1 = System.currentTimeMillis();
+                if(backgroundModel.matchPixel(x,y,foreground.toBufferedImage().getRGB(x,y))){
+                    image.setRGB(x,y,0);
+                    backgroundModel.update(x,y,foreground.toBufferedImage().getRGB(x,y));
+                } else {
+                    image.setRGB(x,y, Color.WHITE.getRGB());
+                }
 
+            }
+            System.out.println(x + "//");
+        }
 
-
-        return null;
+        return new ImageBin(image);
     }
 }

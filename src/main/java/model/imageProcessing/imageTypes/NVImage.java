@@ -80,7 +80,7 @@ public abstract class NVImage implements Cloneable{
      * @return the width of the image
      */
     public int getHeight(){
-        return Image.length;
+        return Image[0].length;
     }
 
     /**
@@ -88,7 +88,7 @@ public abstract class NVImage implements Cloneable{
      * @return the height of the image
      */
     public int getWidth(){
-        return Image[0].length;
+        return Image.length;
     }
 
     @Override

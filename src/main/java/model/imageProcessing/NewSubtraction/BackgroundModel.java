@@ -13,15 +13,16 @@ import java.util.Random;
 public class BackgroundModel {
     private List<BufferedImage> cards;
 
-    private Random r = new Random(System.currentTimeMillis());
+    Random r;// = new Random(System.currentTimeMillis());
 
-    private int frameSize = 40;
+    private int frameSize = 10;
     private int matchingThreshold = 20;
     private int requiredMatches = 2;
     private int updateFactor = 16;
 
-    public BackgroundModel(int sampleSize, ImageGray baseImage){
+    public BackgroundModel(ImageGray baseImage, int sampleSize){
         cards = new ArrayList<>();
+        r = new Random(System.currentTimeMillis());
         initCards(sampleSize, baseImage);
     }
 
@@ -36,21 +37,18 @@ public class BackgroundModel {
             for (int x = 0; x < width; x++) {
                 for (int y = 0; y < height; y++) {
 
-                    int xshift = r.nextInt(frameSize) - frameSize /2 ;
-                    int yshift = r.nextInt(frameSize) - frameSize /2 ;
+                    newSample.setRGB(x,y,getRandPixel(cards.get(0),x,y));
 
-                    int x1 = x + xshift > width ? x - xshift : Math.abs(x + xshift) ;
-                    int y1 = y + yshift > height ? y - yshift : Math.abs(y + yshift) ;
 
-                    int pixel = cards.get(i).getRGB(x1,y1);
-
-                    newSample.setRGB(x,y,pixel);
                 }
             }
+
+            cards.add(newSample);
         }
     }
 
-    private boolean mathPixel(int x, int y, int color){
+    public boolean matchPixel(int x, int y, int color){
+        long t1 = System.currentTimeMillis();
 
         int matches = 0;
 
@@ -65,16 +63,24 @@ public class BackgroundModel {
             }
         }
 
+        long t2 = System.currentTimeMillis();
+        System.out.println("matching in: " + (t2-t1));
         return false;
     }
 
-    private boolean update(int x, int y, int color){
+    public boolean update(int x, int y, int color){
+
+        long t1 = System.currentTimeMillis();
+
+        Random r = new Random(System.currentTimeMillis());
 
         if ( r.nextInt(100) < (1/updateFactor * 100) ){
 
+            int xshift = r.nextInt(frameSize) - frameSize /2 ;
+            int yshift = r.nextInt(frameSize) - frameSize /2 ;
 
-            int xshift = r.nextInt(2) - 1 ;
-            int yshift = r.nextInt(2) - 1 ;
+            //int xshift = r.nextInt(2) - 1 ;
+            //int yshift = r.nextInt(2) - 1 ;
 
             int width = cards.get(0).getWidth();
             int height = cards.get(0).getWidth();
@@ -82,16 +88,41 @@ public class BackgroundModel {
             int x1 = x + xshift > width ? x - xshift : Math.abs(x + xshift) ;
             int y1 = y + yshift > height ? y - yshift : Math.abs(y + yshift) ;
 
-            cards.get(r.nextInt(20)).setRGB(x,y,color);
-            cards.get(r.nextInt(20)).setRGB(x1,y1,color);
+            cards.get(r.nextInt(cards.size())).setRGB(x,y,color);
+            cards.get(r.nextInt(cards.size())).setRGB(x1,y1,color);
 
         }
+
+        long t2 = System.currentTimeMillis();
+
+        System.out.println("update in: " + (t2-t1));
 
         return false;
     }
 
-    private int getRandPixel(){
+    public int getRandPixel(BufferedImage image, int x, int y){
         //TODO: complete this
-        return 0;
+
+
+
+        int width = image.getWidth();
+        int height = image.getHeight();
+
+        int xshift = r.nextInt(frameSize-1) - frameSize /2 ;
+        int yshift = r.nextInt(frameSize-1) - frameSize /2 ;
+
+        int x1 = x + xshift >= width ? x - xshift : Math.abs(x + xshift) ;
+        int y1 = y + yshift >= height ? y - yshift : Math.abs(y + yshift) ;
+
+        int rgb = 0;
+
+        try {
+            rgb = image.getRGB(x1, y1);
+        } catch (java.lang.ArrayIndexOutOfBoundsException ex){
+            System.out.println(x1 + " // "+  y1);
+        }
+
+        return rgb;
+
     }
 }
