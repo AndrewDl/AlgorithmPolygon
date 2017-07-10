@@ -23,6 +23,7 @@ public abstract class NVImage implements Cloneable{
      * @return internal data converted to BufferedImage
      */
     public BufferedImage toBufferedImage(){
+
         return toBufferedImage(Image);
     }
 
@@ -33,6 +34,8 @@ public abstract class NVImage implements Cloneable{
      */
     protected BufferedImage toBufferedImage(int[][] rgbArray){
 
+        //long t1 = System.currentTimeMillis();
+
         int width = rgbArray.length;
         int height = rgbArray[0].length;
 
@@ -41,6 +44,10 @@ public abstract class NVImage implements Cloneable{
         for (int i = 0; i < width; i++)
             for (int j = 0; j < height; j++)
                 image.setRGB(i,j,rgbArray[i][j]);
+
+        //long t2 = System.currentTimeMillis();
+        //System.out.println(" To buffered image in : " + (t2-t1));
+
         return image;
     }
 
@@ -49,13 +56,17 @@ public abstract class NVImage implements Cloneable{
      * @return pixel array by <b>value</b>
      */
     public int[][] toPixelArray(){
+/*
+        long t1 = System.currentTimeMillis();
 
         int[][] result = Image.clone();
         for (int i = 0; i < Image.length ; i++) {
             result[i] = Image[i].clone();
         }
 
-        return result;
+        long t2 = System.currentTimeMillis();
+        System.out.println(" To pixel array : " + (t2-t1));*/
+        return Image;
     }
 
     /**
