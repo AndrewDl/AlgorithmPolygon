@@ -32,7 +32,7 @@ public class BackgroundModel {
         height = array[0].length;
 
         r = new Random(System.currentTimeMillis());
-        initCards(sampleSize, baseImage);
+        initCards(sampleSize+1, baseImage);
     }
 
     private void initCards(int sampleSize,ImageGray baseImage){
@@ -92,19 +92,18 @@ public class BackgroundModel {
 
         //Random r = new Random(System.currentTimeMillis());
 
-        if ( r.nextInt(100) < (1/(float)updateFactor * 100) ){
+        if ( r.nextInt(updateFactor-1) == 0 ){
+            cards.get(r.nextInt(cards.size()))[x][y] = color;
+        }
 
-
-
+        if ( r.nextInt(updateFactor-1) == 0 ){
             int xshift = r.nextInt(1);// == 0 ? 1 : -1; //= r.nextInt(frameSize) - frameSize /2 ;
             int yshift = r.nextInt(1);// == 0 ? 1 : -1; //r.nextInt(frameSize) - frameSize /2 ;
 
             int x1 = x + xshift >= width ? x - xshift : x + xshift ;
             int y1 = y + yshift >= height ? y - yshift : y + yshift ;
 
-            cards.get(r.nextInt(cards.size()))[x][y] = color;
             cards.get(r.nextInt(cards.size()))[x1][y1] = color;
-
         }
 
         //long t2 = System.currentTimeMillis();
