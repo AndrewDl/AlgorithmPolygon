@@ -19,7 +19,7 @@ public class BackgroundModel {
     Random r;// = new Random(System.currentTimeMillis());
 
     private int frameSize = 1;
-    private int matchingThreshold = 40;
+    private int matchingThreshold = 20;
     private int requiredMatches = 10;
     private int updateFactor = 16;
 
@@ -52,6 +52,18 @@ public class BackgroundModel {
             cards.add(newSample);
         }
     }
+
+    public int getMatchingThreshold(){return matchingThreshold;}
+
+    public void setMatchingThreshold(int matchingThreshold){this.matchingThreshold = matchingThreshold;}
+
+    public int getRequiredMatches(){return requiredMatches;}
+
+    public void setRequiredMatches(int requiredMatches){this.requiredMatches = requiredMatches;}
+
+    public int getUpdateFactor(){return updateFactor;}
+
+    public void setUpdateFactor(int updateFactor){this.updateFactor = updateFactor;}
 
     public boolean matchPixel(int x, int y, int color){
         //long t1 = System.currentTimeMillis();
@@ -87,8 +99,8 @@ public class BackgroundModel {
             int xshift = r.nextInt(1);// == 0 ? 1 : -1; //= r.nextInt(frameSize) - frameSize /2 ;
             int yshift = r.nextInt(1);// == 0 ? 1 : -1; //r.nextInt(frameSize) - frameSize /2 ;
 
-            int x1 = x + xshift > width ? x - xshift : x + xshift ;
-            int y1 = y + yshift > height ? y - yshift : y + yshift ;
+            int x1 = x + xshift >= width ? x - xshift : x + xshift ;
+            int y1 = y + yshift >= height ? y - yshift : y + yshift ;
 
             cards.get(r.nextInt(cards.size()))[x][y] = color;
             cards.get(r.nextInt(cards.size()))[x1][y1] = color;
@@ -108,8 +120,8 @@ public class BackgroundModel {
         int xshift = r.nextInt(1);// == 0 ? 1 : -1; //= r.nextInt(frameSize) - frameSize /2 ;
         int yshift = r.nextInt(1);// == 0 ? 1 : -1; //r.nextInt(frameSize) - frameSize /2 ;
 
-        int x1 = x + xshift > width ? x - xshift : x + xshift ;
-        int y1 = y + yshift > height ? y - yshift : y + yshift ;
+        int x1 = x + xshift >= width ? x - xshift : x + xshift ;
+        int y1 = y + yshift >= height ? y - yshift : y + yshift ;
 
         int rgb = image[x1][y1];
 

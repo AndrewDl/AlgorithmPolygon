@@ -1,20 +1,22 @@
 package view;
 
 import javafx.application.Platform;
+import javafx.beans.value.ObservableValue;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
+import javafx.scene.control.Slider;
+import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
+import javafx.event.ActionEvent;
 import model.cameras.CameraConnectionIssueException;
 import model.cameras.CameraImageJavaCV;
-import model.imageProcessing.NewSubtraction.BackgroundModel;
 import model.imageProcessing.NewSubtraction.NewBGSubtractor;
 import model.imageProcessing.imageTypes.ImageGray;
 import model.imageProcessing.imageTypes.NVImage;
 
 import javax.swing.*;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.net.URL;
@@ -30,12 +32,57 @@ public class Controller implements Initializable {
     @FXML
     private Label labelFPS;
 
+    @FXML
+    private Slider sliderMatchingThreshold;
+    @FXML
+    private Slider sliderRequiredMatches;
+    @FXML
+    private Slider sliderUpdateFactor;
+
+    @FXML
+    private TextField textMatchingThreshold;
+    @FXML
+    private TextField textRequiredMatches;
+    @FXML
+    private TextField textUpdateFactor;
+
+    NewBGSubtractor subtractor;
+
     private int fps = 0;
 
     public void initialize(URL location, ResourceBundle resources) {
-        imageViewOriginal.setImage(SwingFXUtils.toFXImage(new BufferedImage(10,10,1),null));
 
-        CameraImageJavaCV camera = new CameraImageJavaCV("rtsp://admin:skymallcamera7@46.219.14.78:30001/h264/ch01/sub/av_stream");
+        sliderMatchingThreshold.setValue(20);
+        sliderRequiredMatches.setValue(2);
+        sliderUpdateFactor.setValue(16);
+        textMatchingThreshold.setText(String.valueOf((int)sliderMatchingThreshold.getValue()));
+        textRequiredMatches.setText(String.valueOf((int)sliderRequiredMatches.getValue()));
+        textUpdateFactor.setText(String.valueOf((int)sliderUpdateFactor.getValue()));
+
+        sliderMatchingThreshold.valueProperty().addListener(new javafx.beans.value.ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                textMatchingThreshold.setText( String.valueOf(newValue.intValue()));
+            }
+        });
+        sliderRequiredMatches.valueProperty().addListener(new javafx.beans.value.ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                textRequiredMatches.setText( String.valueOf(newValue.intValue()));
+            }
+        });
+        sliderUpdateFactor.valueProperty().addListener(new javafx.beans.value.ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                textUpdateFactor.setText( String.valueOf(newValue.intValue()));
+            }
+        });
+
+
+        imageViewOriginal.setImage(SwingFXUtils.toFXImage(new BufferedImage(10,10,1),null));
+//"rtsp://admin:skymallcamera7@46.219.14.78:30001/h264/ch01/sub/av_stream"
+        //"rtsp://admin:dlandre12@192.168.0.64/h264/ch01/sub/av_stream"
+        CameraImageJavaCV camera = new CameraImageJavaCV("rtsp://admin:skymallcamera8@46.219.14.78:30002/h264/ch01/sub/av_stream");
 
         //BufferedImage initialImage = null;
 
@@ -46,7 +93,11 @@ public class Controller implements Initializable {
             } catch (CameraConnectionIssueException e) {
                 e.printStackTrace();
             }
-            NewBGSubtractor subtractor = new NewBGSubtractor(new ImageGray(initialImage));
+            subtractor = new NewBGSubtractor(new ImageGray(initialImage));
+
+            subtractor.backgroundModel.setMatchingThreshold( Integer.valueOf( textMatchingThreshold.getText() ) );
+            subtractor.backgroundModel.setUpdateFactor( Integer.valueOf( textUpdateFactor.getText() ) );
+            subtractor.backgroundModel.setRequiredMatches( Integer.valueOf( textRequiredMatches.getText() ) );
 
             try {
                 initialImage = camera.getBufferedImage();
@@ -70,26 +121,29 @@ public class Controller implements Initializable {
 
 
 
-        Timer timerFPS = new Timer(1000, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
+        Timer timerFPS = new Timer(1000, e -> Platform.runLater(() -> {
+            int localFPS = fps;
+            labelFPS.setText(String.valueOf(localFPS));
 
-                Platform.runLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        int localFPS = fps;
-                        labelFPS.setText(String.valueOf(localFPS));
-
-                        fps = 0;
-                    }
-                });
-
-            }
-        });
+            fps = 0;
+        }));
 
         timerFPS.start();
 
         t.start();
 
     }
+
+    public void buttonApplyPressed(ActionEvent actionEvent) {
+        subtractor.backgroundModel.setMatchingThreshold( Integer.valueOf( textMatchingThreshold.getText() ) );
+        subtractor.backgroundModel.setUpdateFactor( Integer.valueOf( textUpdateFactor.getText() ) );
+        subtractor.backgroundModel.setRequiredMatches( Integer.valueOf( textRequiredMatches.getText() ) );
+    }
+
+//    public void buttonApplyPressed(ActionEvent actionEvent) {
+//        subtractor.backgroundModel.setMatchingThreshold( Integer.valueOf( textMatchingThreshold.getText() ) );
+//        subtractor.backgroundModel.setUpdateFactor( Integer.valueOf( textUpdateFactor.getText() ) );
+//        subtractor.backgroundModel.setRequiredMatches( Integer.valueOf( textRequiredMatches.getText() ) );
+//    }
+
 }

@@ -14,8 +14,8 @@ import java.awt.image.BufferedImage;
  */
 public class NewBGSubtractor implements ISubtractor {
 
-    BufferedImage image;
-    BackgroundModel backgroundModel;
+    private BufferedImage image;
+    public BackgroundModel backgroundModel;
 
     private NewBGSubtractor(){}
 
