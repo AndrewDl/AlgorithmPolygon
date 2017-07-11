@@ -35,7 +35,7 @@ public class Controller implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         imageViewOriginal.setImage(SwingFXUtils.toFXImage(new BufferedImage(10,10,1),null));
 
-        CameraImageJavaCV camera = new CameraImageJavaCV("rtsp://admin:skymallcamera7@46.219.14.78:30001/h264/ch01/sub/av_stream");
+        CameraImageJavaCV camera = new CameraImageJavaCV("rtsp://admin:dlandre12@192.168.0.64/h264/ch01/sub/av_stream");
 
         //BufferedImage initialImage = null;
 
@@ -57,6 +57,7 @@ public class Controller implements Initializable {
                 try {
                     BufferedImage camImage = camera.getBufferedImage();
                     NVImage result = subtractor.getSubtractedImage(new ImageGray(camImage),null);
+
                     imageViewOriginal.setImage(SwingFXUtils.toFXImage(camImage,null));
                     imageViewDerivative1.setImage(SwingFXUtils.toFXImage(result.toBufferedImage(),null));
                     fps = fps+1;

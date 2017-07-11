@@ -16,6 +16,7 @@ public class NewBGSubtractor implements ISubtractor {
 
     BufferedImage image;
     BackgroundModel backgroundModel;
+    AvgPixelFill AvgFilter;
 
     private NewBGSubtractor(){}
 
@@ -37,13 +38,16 @@ public class NewBGSubtractor implements ISubtractor {
                 } else {
                     image.setRGB(x,y, 0);
                 }
+
+
                 //long t2 = System.currentTimeMillis();
                 //System.out.println("Updated row in: " + (t2-t1));
 
             }
             //System.out.println(x + "//");
         }
-
-        return new ImageBin(image);
+       // return new ImageBin(image);
+        ImageBin image2 = new ImageBin(image);
+        return new AvgPixelFill().AvarageFilter(image2);
     }
 }
