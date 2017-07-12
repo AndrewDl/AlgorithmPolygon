@@ -12,6 +12,7 @@ import javafx.scene.image.ImageView;
 import javafx.event.ActionEvent;
 import model.cameras.CameraConnectionIssueException;
 import model.cameras.CameraImageJavaCV;
+import model.imageProcessing.NewSubtraction.AvgPixelFill;
 import model.imageProcessing.NewSubtraction.NewBGSubtractor;
 import model.imageProcessing.imageTypes.ImageBin;
 import model.imageProcessing.imageTypes.ImageGray;
@@ -33,6 +34,8 @@ public class Controller implements Initializable {
     private ImageView imageViewOriginal;
     @FXML
     private ImageView imageViewDerivative1;
+    @FXML
+    private ImageView imageViewDerivative2;
     @FXML
     private Label labelFPS;
 
@@ -110,13 +113,14 @@ public class Controller implements Initializable {
             while (true){
                 try {
                     BufferedImage camImage = camera.getBufferedImage();
-                    NVImage result = subtractor.getSubtractedImage(new ImageGray(camImage),null);
-                    Platform.runLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            imageViewOriginal.setImage(SwingFXUtils.toFXImage(camImage,null));
-                            imageViewDerivative1.setImage(SwingFXUtils.toFXImage(result.toBufferedImage(),null));
-                        }
+                    ImageBin result = subtractor.getSubtractedImage(new ImageGray(camImage),null);
+                    AvgPixelFill filter = new AvgPixelFill();
+                    BufferedImage filterResult = filter.AvarageFilter(result).toBufferedImage();
+
+                    Platform.runLater(() -> {
+                        imageViewOriginal.setImage(SwingFXUtils.toFXImage(camImage,null));
+                        imageViewDerivative1.setImage(SwingFXUtils.toFXImage(result.toBufferedImage(),null));
+                        imageViewDerivative2.setImage(SwingFXUtils.toFXImage(filterResult,null));
                     });
                     fps = fps+1;
 
