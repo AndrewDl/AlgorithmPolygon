@@ -58,8 +58,15 @@ public class Controller implements Initializable {
                     BufferedImage camImage = camera.getBufferedImage();
                     NVImage result = subtractor.getSubtractedImage(new ImageGray(camImage),null);
 
-                    imageViewOriginal.setImage(SwingFXUtils.toFXImage(camImage,null));
-                    imageViewDerivative1.setImage(SwingFXUtils.toFXImage(result.toBufferedImage(),null));
+                    Platform.runLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            imageViewOriginal.setImage(SwingFXUtils.toFXImage(camImage,null));
+                            imageViewDerivative1.setImage(SwingFXUtils.toFXImage(result.toBufferedImage(),null));
+                        }
+                    });
+
+
                     fps = fps+1;
 
                 } catch (CameraConnectionIssueException e) {

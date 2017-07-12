@@ -41,12 +41,12 @@ public class NewBGSubtractor implements ISubtractor {
 
 
                 //long t2 = System.currentTimeMillis();
-                //System.out.println("Updated row in: " + (t2-t1));
+               // System.out.println("Updated row in: " + (t2-t1));
 
             }
             //System.out.println(x + "//");
         }
-       // return new ImageBin(image);
+//       return new ImageBin(image);
         ImageBin image2 = new ImageBin(image);
         return new AvgPixelFill().AvarageFilter(image2);
     }
