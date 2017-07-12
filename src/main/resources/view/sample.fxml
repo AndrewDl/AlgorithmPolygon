@@ -77,5 +77,6 @@
          </padding>
       </HBox>
       <Button fx:id="buttonApply" mnemonicParsing="false" onAction="#buttonApplyPressed" text="Apply" />
+      <Button fx:id="buttonScreenshot" mnemonicParsing="false" onAction="#buttonScreenshotPressed" text="Shot" />
    </children>
 </VBox>

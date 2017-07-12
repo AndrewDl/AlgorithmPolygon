@@ -13,12 +13,16 @@ import javafx.event.ActionEvent;
 import model.cameras.CameraConnectionIssueException;
 import model.cameras.CameraImageJavaCV;
 import model.imageProcessing.NewSubtraction.NewBGSubtractor;
+import model.imageProcessing.imageTypes.ImageBin;
 import model.imageProcessing.imageTypes.ImageGray;
 import model.imageProcessing.imageTypes.NVImage;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -78,7 +82,6 @@ public class Controller implements Initializable {
             }
         });
 
-
         imageViewOriginal.setImage(SwingFXUtils.toFXImage(new BufferedImage(10,10,1),null));
 //"rtsp://admin:skymallcamera7@46.219.14.78:30001/h264/ch01/sub/av_stream"
         //"rtsp://admin:dlandre12@192.168.0.64/h264/ch01/sub/av_stream"
@@ -108,8 +111,13 @@ public class Controller implements Initializable {
                 try {
                     BufferedImage camImage = camera.getBufferedImage();
                     NVImage result = subtractor.getSubtractedImage(new ImageGray(camImage),null);
-                    imageViewOriginal.setImage(SwingFXUtils.toFXImage(camImage,null));
-                    imageViewDerivative1.setImage(SwingFXUtils.toFXImage(result.toBufferedImage(),null));
+                    Platform.runLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            imageViewOriginal.setImage(SwingFXUtils.toFXImage(camImage,null));
+                            imageViewDerivative1.setImage(SwingFXUtils.toFXImage(result.toBufferedImage(),null));
+                        }
+                    });
                     fps = fps+1;
 
                 } catch (CameraConnectionIssueException e) {
@@ -118,8 +126,6 @@ public class Controller implements Initializable {
 
             }
         });
-
-
 
         Timer timerFPS = new Timer(1000, e -> Platform.runLater(() -> {
             int localFPS = fps;
@@ -130,8 +136,8 @@ public class Controller implements Initializable {
 
         timerFPS.start();
 
+        t.setDaemon(true);
         t.start();
-
     }
 
     public void buttonApplyPressed(ActionEvent actionEvent) {
@@ -140,10 +146,22 @@ public class Controller implements Initializable {
         subtractor.backgroundModel.setRequiredMatches( Integer.valueOf( textRequiredMatches.getText() ) );
     }
 
-//    public void buttonApplyPressed(ActionEvent actionEvent) {
-//        subtractor.backgroundModel.setMatchingThreshold( Integer.valueOf( textMatchingThreshold.getText() ) );
-//        subtractor.backgroundModel.setUpdateFactor( Integer.valueOf( textUpdateFactor.getText() ) );
-//        subtractor.backgroundModel.setRequiredMatches( Integer.valueOf( textRequiredMatches.getText() ) );
-//    }
+    public void buttonScreenshotPressed(ActionEvent actionEvent) {
+        ImageBin image = new ImageBin(SwingFXUtils.fromFXImage(imageViewDerivative1.getImage(),null));
 
+        File folder = new File("shots");
+
+        System.out.println(folder.exists());
+
+        File[] files = folder.listFiles();
+
+        File screenshot = new File("shots/" + (System.currentTimeMillis()) + ".jpg");
+
+        try {
+            ImageIO.write(image.toBufferedImage(),"jpg",screenshot);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
 }
