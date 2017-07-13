@@ -5,10 +5,15 @@ import model.imageProcessing.imageTypes.ImageBin;
 /**
  * Created by Laimi on 13.07.2017.
  */
+/**
+ * Radius can be changed now and used as new parameter.
+ * Also counter can be used as additional parameter on UI.
+ * Probably the best values for radius between 2 and 5 included.
+ */
 public class EnchAvgPixelFill extends AvgPixelFill {
     public boolean getSummPlus(int[][] a, int x, int y){
-        int count = 0;
-        int r=3;
+         int count = 0;
+        int r=3;//radius
        for (int i = x-r; i < x+r; i++) {
            for (int j = y-r; j < y+r; j++) {
 //               if(x<=0||y<=0){ j+=r; i+=r; x+=r; y+=r; }
@@ -26,6 +31,9 @@ public class EnchAvgPixelFill extends AvgPixelFill {
         }
         else return true;
     }
+    /**
+     * filter wich changes lonely 0 and 1 pixels to color of their neigbors
+     */
     public ImageBin EnchAvarageFilter(ImageBin image){
         int[][] originalImage = image.toPixelArray();
         int width = originalImage.length;
