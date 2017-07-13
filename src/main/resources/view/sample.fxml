@@ -17,6 +17,7 @@
             <ImageView fx:id="imageViewOriginal" fitHeight="240.0" fitWidth="320.0" pickOnBounds="true" preserveRatio="true" />
             <ImageView fx:id="imageViewDerivative1" fitHeight="240.0" fitWidth="320.0" pickOnBounds="true" preserveRatio="true" />
             <ImageView fx:id="imageViewDerivative2" fitHeight="240.0" fitWidth="320.0" pickOnBounds="true" preserveRatio="true" />
+            <ImageView fx:id="imageViewDerivative3" fitHeight="240.0" fitWidth="320.0" pickOnBounds="true" preserveRatio="true" />
          </children>
       </HBox>
       <Label fx:id="labelFPS" text="FPS" />

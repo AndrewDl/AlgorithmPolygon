@@ -40,6 +40,11 @@ public class AvgPixelFill {
        if(a[x][y]==a[x][y-1]&&a[x][y]!=0)count++;
        if(a[x][y]==a[x+1][y]&&a[x][y]!=0)count++;
        if(a[x][y]==a[x][y+1]&&a[x][y]!=0)count++;
+//       if(a[x][y]==a[x-1][y-1]&&a[x][y]!=0)count++;
+//       if(a[x][y]==a[x+1][y-1]&&a[x][y]!=0)count++;
+//       if(a[x][y]==a[x+1][y+1]&&a[x][y]!=0)count++;
+//       if(a[x][y]==a[x-1][y+1]&&a[x][y]!=0)count++;
+
      //  System.out.println(count);
       if(count>=3){
       //   System.out.println("tok");
