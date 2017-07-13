@@ -14,17 +14,22 @@ import model.cameras.CameraConnectionIssueException;
 import model.cameras.CameraImageJavaCV;
 import model.imageProcessing.NewSubtraction.AvgPixelFill;
 import model.imageProcessing.NewSubtraction.NewBGSubtractor;
+import model.imageProcessing.SceneObject;
 import model.imageProcessing.imageTypes.ImageBin;
 import model.imageProcessing.imageTypes.ImageGray;
 import model.imageProcessing.imageTypes.NVImage;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionListener;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 
 
@@ -59,8 +64,8 @@ public class Controller implements Initializable {
 
     public void initialize(URL location, ResourceBundle resources) {
 
-        sliderMatchingThreshold.setValue(20);
-        sliderRequiredMatches.setValue(2);
+        sliderMatchingThreshold.setValue(40);
+        sliderRequiredMatches.setValue(10);
         sliderUpdateFactor.setValue(16);
         textMatchingThreshold.setText(String.valueOf((int)sliderMatchingThreshold.getValue()));
         textRequiredMatches.setText(String.valueOf((int)sliderRequiredMatches.getValue()));
@@ -88,7 +93,7 @@ public class Controller implements Initializable {
         imageViewOriginal.setImage(SwingFXUtils.toFXImage(new BufferedImage(10,10,1),null));
 //"rtsp://admin:skymallcamera7@46.219.14.78:30001/h264/ch01/sub/av_stream"
         //"rtsp://admin:dlandre12@192.168.0.64/h264/ch01/sub/av_stream"
-        CameraImageJavaCV camera = new CameraImageJavaCV("rtsp://admin:skymallcamera8@46.219.14.78:30002/h264/ch01/sub/av_stream");
+        CameraImageJavaCV camera = new CameraImageJavaCV("rtsp://admin:skymallcamera4@46.219.14.113:30001/h264/ch01/sub/av_stream");
 
         //BufferedImage initialImage = null;
 
@@ -111,22 +116,45 @@ public class Controller implements Initializable {
                 e.printStackTrace();
             }
             while (true){
+                BufferedImage camImage = null;
+
                 try {
-                    BufferedImage camImage = camera.getBufferedImage();
-                    ImageBin result = subtractor.getSubtractedImage(new ImageGray(camImage),null);
-                    AvgPixelFill filter = new AvgPixelFill();
-                    BufferedImage filterResult = filter.AvarageFilter(result).toBufferedImage();
-
-                    Platform.runLater(() -> {
-                        imageViewOriginal.setImage(SwingFXUtils.toFXImage(camImage,null));
-                        imageViewDerivative1.setImage(SwingFXUtils.toFXImage(result.toBufferedImage(),null));
-                        imageViewDerivative2.setImage(SwingFXUtils.toFXImage(filterResult,null));
-                    });
-                    fps = fps+1;
-
+                    camImage = camera.getBufferedImage();
                 } catch (CameraConnectionIssueException e) {
                     e.printStackTrace();
                 }
+
+                ImageBin result = subtractor.getSubtractedImage(new ImageGray(camImage),null);
+
+                AvgPixelFill filter = new AvgPixelFill();
+
+                NVImage filterResultImg = filter.AvarageFilter(result);
+
+                BufferedImage filterResult = filterResultImg.toBufferedImage();
+
+                int[][] imageArray = filterResultImg.toPixelArray();
+
+                List<SceneObject> objects = getObjects(imageArray);
+
+                Graphics g = filterResult.createGraphics();
+                g.setColor(Color.BLUE);
+                for (SceneObject object : objects){
+                    Rectangle bounds = object.getBounds();
+                    g.drawRect(bounds.x,bounds.y,bounds.width,bounds.height);
+                }
+
+                g.dispose();
+
+
+                BufferedImage test = camImage;
+
+                Platform.runLater(() -> {
+                    imageViewOriginal.setImage(SwingFXUtils.toFXImage(test,null));
+                    imageViewDerivative1.setImage(SwingFXUtils.toFXImage(result.toBufferedImage(),null));
+                    imageViewDerivative2.setImage(SwingFXUtils.toFXImage(filterResult,null));
+                });
+                fps = fps+1;
+
 
             }
         });
@@ -151,7 +179,7 @@ public class Controller implements Initializable {
     }
 
     public void buttonScreenshotPressed(ActionEvent actionEvent) {
-        ImageBin image = new ImageBin(SwingFXUtils.fromFXImage(imageViewDerivative1.getImage(),null));
+        ImageBin image = new ImageBin(SwingFXUtils.fromFXImage(imageViewDerivative2.getImage(),null));
 
         File folder = new File("shots");
 
@@ -167,5 +195,39 @@ public class Controller implements Initializable {
             e.printStackTrace();
         }
 
+    }
+
+    private List<SceneObject> getObjects(int[][] image){
+
+        int frameWidth = 50;
+        int frameHeight = 50;
+        int average = (frameHeight*frameWidth)/5;
+
+        List<SceneObject> objectList = new ArrayList<SceneObject>();
+
+        for (int i = 0; i < image[0].length - frameWidth; i+=30) {
+            for (int j = 0; j < image.length - frameHeight; j+=30) {
+
+                int localAverage = 0;
+
+                for (int k = 0; k < frameWidth; k++) {
+                    for (int l = 0; l < frameHeight; l++) {
+                        int pixel = (image[j+l][i+k] & 0xFF);
+                        if ( pixel != 0) {
+                            localAverage += 1;
+                        }
+                    }
+                }
+
+                //localAverage = localAverage/(frameHeight*frameWidth);
+
+                if (localAverage >= average){
+                    objectList.add(new SceneObject(new Rectangle(j,i,frameWidth,frameHeight),localAverage));
+                }
+
+            }
+        }
+
+        return objectList;
     }
 }

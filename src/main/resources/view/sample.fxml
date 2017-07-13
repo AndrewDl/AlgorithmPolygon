@@ -12,11 +12,26 @@
 
 <VBox xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="view.Controller">
    <children>
-      <HBox>
+      <HBox spacing="5.0">
          <children>
-            <ImageView fx:id="imageViewOriginal" fitHeight="240.0" fitWidth="320.0" pickOnBounds="true" preserveRatio="true" />
-            <ImageView fx:id="imageViewDerivative1" fitHeight="240.0" fitWidth="320.0" pickOnBounds="true" preserveRatio="true" />
-            <ImageView fx:id="imageViewDerivative2" fitHeight="240.0" fitWidth="320.0" pickOnBounds="true" preserveRatio="true" />
+            <VBox prefHeight="200.0" prefWidth="100.0">
+               <children>
+                  <Label text="Original" />
+                  <ImageView fx:id="imageViewOriginal" fitHeight="240.0" fitWidth="320.0" pickOnBounds="true" preserveRatio="true" />
+               </children>
+            </VBox>
+            <VBox prefHeight="200.0" prefWidth="100.0">
+               <children>
+                  <Label text="Subtracted" />
+                  <ImageView fx:id="imageViewDerivative1" fitHeight="240.0" fitWidth="320.0" pickOnBounds="true" preserveRatio="true" />
+               </children>
+            </VBox>
+            <VBox prefHeight="200.0" prefWidth="100.0">
+               <children>
+                  <Label text="Filter" />
+                  <ImageView fx:id="imageViewDerivative2" fitHeight="240.0" fitWidth="320.0" pickOnBounds="true" preserveRatio="true" />
+               </children>
+            </VBox>
          </children>
       </HBox>
       <Label fx:id="labelFPS" text="FPS" />
