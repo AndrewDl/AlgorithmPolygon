@@ -93,7 +93,7 @@ public class Controller implements Initializable {
         imageViewOriginal.setImage(SwingFXUtils.toFXImage(new BufferedImage(10,10,1),null));
 //"rtsp://admin:skymallcamera7@46.219.14.78:30001/h264/ch01/sub/av_stream"
         //"rtsp://admin:dlandre12@192.168.0.64/h264/ch01/sub/av_stream"
-        CameraImageJavaCV camera = new CameraImageJavaCV("rtsp://admin:skymallcamera4@46.219.14.113:30001/h264/ch01/sub/av_stream");
+        CameraImageJavaCV camera = new CameraImageJavaCV("rtsp://admin:skymallcamera5@46.219.14.65:30001/h264/ch01/sub/av_stream");
 
         //BufferedImage initialImage = null;
 
@@ -270,7 +270,7 @@ public class Controller implements Initializable {
         for(int x = 0; x < image.length-template.length; x+=10){
             for(int y = 0; y < image[0].length-template[0].length; y+=10){
                 result = getPercent(template, x, y, image);
-                if(result >= 85){
+                if(result >= 83){
 
                     objectList.add(new SceneObject(new Rectangle(y,x,frameWidth,frameHeight), (int)result));
                     //System.out.println("Percentage of similar: " + result);
@@ -315,7 +315,7 @@ public class Controller implements Initializable {
      * @return NEW array with 0 and 1
      */
     private int[][] Binarize(int[][] array){
-        double BinarizationThreshold = 0x20;
+        double BinarizationThreshold = 127;
         int[][] BinarizedImage = new int[array.length][array[0].length];
         int[][] BinarizedImageRGB = new int[array.length][array[0].length];
 
