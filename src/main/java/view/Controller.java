@@ -134,7 +134,10 @@ public class Controller implements Initializable {
 
                 int[][] imageArray = filterResultImg.toPixelArray();
 
-                List<SceneObject> objects = getObjects(imageArray);
+                //List<SceneObject> objects = getObjects(imageArray);
+
+                List<SceneObject> objects = new ArrayList<>();
+                getPeople(objects, imageArray);
 
                 Graphics g = filterResult.createGraphics();
                 g.setColor(Color.BLUE);
@@ -230,4 +233,122 @@ public class Controller implements Initializable {
 
         return objectList;
     }
+
+    //////////////////////////////////////////////////////////////////////////
+    //Viola-Jones
+
+    private void getPeople(List<SceneObject> objects, int[][] image){
+        int[][] Template;
+
+            File templatePath = new File("templates/5.jpg");
+            BufferedImage BufTemp = null;
+            try {
+                BufTemp = ImageIO.read(templatePath);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            Template = toRGBArray(BufTemp);
+            int[][] binarizedImage = Binarize(image);
+            int[][] binarizedTemplate = Binarize(Template);
+            objects.addAll(catchObject(binarizedTemplate, binarizedImage));
+
+    }
+
+    /**
+     * Looks for object at the image
+     * @param template
+     * @param image
+     * @return first coordinates of object
+     */
+    public List<SceneObject> catchObject(int[][] template, int[][] image){
+        int frameWidth = template[0].length;
+        int frameHeight = template.length;
+
+        List<SceneObject> objectList = new ArrayList<>();
+        double result;
+
+        for(int x = 0; x < image.length-template.length; x+=10){
+            for(int y = 0; y < image[0].length-template[0].length; y+=10){
+                result = getPercent(template, x, y, image);
+                if(result >= 85){
+
+                    objectList.add(new SceneObject(new Rectangle(y,x,frameWidth,frameHeight), (int)result));
+                    //System.out.println("Percentage of similar: " + result);
+                }
+            }
+        }
+        return objectList;
+    }
+
+    /**
+     * Compares template to part of image which has size of this template
+     * @param template
+     * @param x - start x-coordinate of image part
+     * @param y - start y-coordinate of image part
+     * @param image - the whole image
+     * @return percent of coincidence between template and part of image
+     */
+    public double getPercent(int[][] template, int x, int y, int[][] image){
+        double percent;
+        int generalQuantity = template.length * template[0].length;
+        int quantityOfSimilar = 0;
+
+        for(int i = 0, m = x; i < template.length && m < template.length+x; i++, m++){
+            for(int j = 0, n = y; j < template[0].length && n < template[0].length+y; j++, n++){
+                if ((template[i][j] == 0 && image[m][n] == 0)) {
+                    quantityOfSimilar++;
+                } else if ((template[i][j] == 1 && image[m][n] == 1)) {
+                    quantityOfSimilar++;
+                }
+            }
+        }
+        percent = ((double) quantityOfSimilar/(double) generalQuantity) * 100;
+        return percent;
+    }
+
+    /**
+     * Binarizes image in pixel array to 0 and 1 for the purpose of mapping objects</br>
+     * not the same as imageBinarize()<br>
+     *     also refreshes binary representation of image that can be accessed by calling <b>getImageBin()</b>
+     *
+     * @param array to binarize. The result of imageBinarize() method;
+     * @return NEW array with 0 and 1
+     */
+    private int[][] Binarize(int[][] array){
+        double BinarizationThreshold = 0x20;
+        int[][] BinarizedImage = new int[array.length][array[0].length];
+        int[][] BinarizedImageRGB = new int[array.length][array[0].length];
+
+        for (int i = 0; i < array.length; i++) {
+            for (int j = 0; j < array[0].length; j++) {
+                int pixel = array[i][j]&0xFF;
+                if (pixel > BinarizationThreshold){
+                    BinarizedImage[i][j]=1;
+                    BinarizedImageRGB[i][j]=0xFFFFFF;
+                } else {
+                    BinarizedImage[i][j]=0;
+                    BinarizedImageRGB[i][j]=0x000000;
+                }
+            }
+        }
+        return BinarizedImage;
+    }
+
+    /**
+     * Turns Buffered Image into RGB-array
+     * @param image - buffered image
+     * @return RGB-array
+     */
+    private int[][] toRGBArray(BufferedImage image){
+
+        int rgbArray[][] = new int[image.getHeight()][image.getWidth()];
+
+        for (int i=0; i < rgbArray.length; i++)
+            for (int j=0; j < rgbArray[0].length; j++)
+            {
+                rgbArray[i][j] = image.getRGB(j,i);
+            }
+        return rgbArray;
+    }
+
 }
