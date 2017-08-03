@@ -240,7 +240,7 @@ public class Controller implements Initializable {
     private void getPeople(List<SceneObject> objects, int[][] image){
         int[][] Template;
 
-            File templatePath = new File("templates/3.jpg");
+            File templatePath = new File("templates/9s.jpg");
             BufferedImage BufTemp = null;
             try {
                 BufTemp = ImageIO.read(templatePath);
@@ -267,10 +267,10 @@ public class Controller implements Initializable {
         List<SceneObject> objectList = new ArrayList<>();
         double result;
 
-        for(int x = 0; x < image.length-template.length; x+=10){
-            for(int y = 0; y < image[0].length-template[0].length; y+=10){
+        for(int x = 0; x < image.length-template.length; x+=40){
+            for(int y = 0; y < image[0].length-template[0].length; y+=40){
                 result = getPercent(template, x, y, image);
-                if(result >= 50){
+                if(result >= 40){
 
                     objectList.add(new SceneObject(new Rectangle(x,y,frameWidth,frameHeight), (int)result));
                     //System.out.println("Percentage of similar: " + result);
