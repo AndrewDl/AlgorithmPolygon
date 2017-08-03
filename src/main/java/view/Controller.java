@@ -141,9 +141,11 @@ public class Controller implements Initializable {
 
                 Graphics g = filterResult.createGraphics();
                 g.setColor(Color.BLUE);
+
+
                 for (SceneObject object : objects){
                     Rectangle bounds = object.getBounds();
-                    g.drawRect(bounds.x,bounds.y,bounds.width,bounds.height);
+                        g.drawRect(bounds.x, bounds.y, bounds.width, bounds.height);
                 }
 
                 g.dispose();
@@ -267,17 +269,51 @@ public class Controller implements Initializable {
         List<SceneObject> objectList = new ArrayList<>();
         double result;
 
-        for(int x = 0; x < image.length-template.length; x+=40){
-            for(int y = 0; y < image[0].length-template[0].length; y+=40){
+        for(int x = 0; x < image.length-template.length; x+=10){
+            for(int y = 0; y < image[0].length-template[0].length; y+=10){
                 result = getPercent(template, x, y, image);
-                if(result >= 40){
+                if(result >= 30){
 
                     objectList.add(new SceneObject(new Rectangle(x,y,frameWidth,frameHeight), (int)result));
                     //System.out.println("Percentage of similar: " + result);
                 }
             }
         }
+        removeSimilar(objectList);
         return objectList;
+    }
+
+    private void removeSimilar(List<SceneObject> objects){
+
+        for (int j = 0; j < objects.size(); j++) {
+            for (int i = 0; i < objects.size(); i++) {
+                if (Math.sqrt(Math.pow(Math.abs(objects.get(i).getBounds().x - objects.get(j).getBounds().x), 2) +
+                        Math.pow(Math.abs(objects.get(i).getBounds().y - objects.get(j).getBounds().y), 2)) < 50 ) {
+                    if (!(objects.get(i).isRemove() == true && objects.get(j).isRemove() == true)) {
+                        if (objects.get(i).getPercent() > objects.get(j).getPercent() && objects.get(j).isRemove()) {
+                            objects.get(j).setRemove(true);
+                            if (objects.get(i).isRemove() == true)
+                                objects.get(i).setRemove(false);
+
+                        } else {
+                            objects.get(i).setRemove(true);
+                            if (objects.get(j).isRemove() == true)
+                                objects.get(j).setRemove(false);
+                        }
+                    }
+                }
+            }
+        }
+
+        for (int i = 0; i < objects.size(); ) {
+
+            if(objects.get(i).isRemove()==true){
+                objects.remove(i);
+            } else {
+                i++;
+            }
+
+        }
     }
 
     /**

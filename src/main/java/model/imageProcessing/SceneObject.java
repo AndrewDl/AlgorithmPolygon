@@ -12,7 +12,7 @@ import java.util.Random;
 public class SceneObject{
     //TODO: Finish this and make some comments
     private Rectangle Bounds;
-    private int Area;
+    private int percent;
     private Long ParentID = null;
     private Long ID;
 
@@ -28,9 +28,10 @@ public class SceneObject{
 
     private boolean passed = false;
     private int Generation = 0;
+    private boolean remove = false;
 
-    public SceneObject( Rectangle bounds, int area){
-        Area = area;
+    public SceneObject( Rectangle bounds, int Percent){
+        percent = Percent;
         Bounds = bounds;
         BornTime = new Date().getTime();
 
@@ -39,13 +40,21 @@ public class SceneObject{
         passedLines = new ArrayList<>();
     }
 
+    public boolean isRemove() {
+        return remove;
+    }
+
+    public void setRemove(boolean remove) {
+        this.remove = remove;
+    }
+
     /**
      * Makes a clone of given instance
      * @param sceneObject instance to clone
      */
     public SceneObject( SceneObject sceneObject ){
         this.Bounds = sceneObject.getBounds();
-        this.Area = sceneObject.getArea();
+        this.percent = sceneObject.getPercent();
         this.ParentID = sceneObject.getParentID();
         this.ID = sceneObject.getID();
         this.BornTime = sceneObject.BornTime;
@@ -56,7 +65,7 @@ public class SceneObject{
 
     public SceneObject(){
         this.Bounds = new Rectangle();
-        this.Area = 0;
+        this.percent = 0;
         this.ParentID = null;
 
         Random r = new Random();
@@ -85,10 +94,6 @@ public class SceneObject{
 
     public void setBounds(Rectangle bounds) {
         Bounds = bounds;
-    }
-
-    public int getArea(){
-        return Area=Bounds.height*Bounds.width;
     }
 
     public Long getID(){
@@ -145,4 +150,11 @@ public class SceneObject{
         return false;
     }
 
+    public int getPercent(){
+        return percent;
+    }
+
+    public void setPercent(int Percent){
+        percent = Percent;
+    }
 }
